@@ -4,6 +4,8 @@ import java.util.List;
 import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 
 import com.callmonitor.model.Call;
@@ -14,6 +16,10 @@ public class CallService {
 
     @Autowired
     private CallRepository callRepository;
+
+    public Page<Call> getCallsPage(int page, int size) {
+        return callRepository.findAll(PageRequest.of(page, size));
+    }
 
     public List<Call> getAllCalls() {
         return callRepository.findAll();

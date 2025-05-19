@@ -4,6 +4,7 @@ import java.util.List;
 import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -11,9 +12,10 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.callmonitor.model.Call;
+import com.callmonitor.model.Call; // import this
 import com.callmonitor.service.CallService;
 
 @RestController
@@ -22,10 +24,20 @@ public class CallController {
     @Autowired
     private CallService callService;
 
+    // Pagination-enabled call list endpoint
     @GetMapping
-    public ResponseEntity<List<Call>> getAllCalls() {
-        return ResponseEntity.ok(callService.getAllCalls());
+    public ResponseEntity<Page<Call>> getAllCalls(
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "10") int size) {
+        Page<Call> callsPage = callService.getCallsPage(page, size);
+        return ResponseEntity.ok(callsPage);
     }
+
+    @GetMapping("/history")
+ public List<Call> getEndedCalls() {
+   return callRepository.findByStatus("ENDED");
+ }
+
 
     @GetMapping("/{id}")
     public ResponseEntity<Call> getCallById(@PathVariable Long id) {
